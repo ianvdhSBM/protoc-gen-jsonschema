@@ -11,7 +11,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	descriptor "google.golang.org/protobuf/types/descriptorpb"
 
-	"github.com/chrusty/protoc-gen-jsonschema/internal/protos"
+	"github.com/ianvdhSBM/protoc-gen-jsonschema/internal/protos"
 )
 
 var (

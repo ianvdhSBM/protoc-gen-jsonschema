@@ -1,5 +1,4 @@
-Protobuf to JSON-Schema compiler
-================================
+# Protobuf to JSON-Schema compiler
 
 This takes protobuf definitions and converts them into JSONSchemas, which can be used to dynamically validate JSON messages.
 
@@ -7,16 +6,12 @@ Useful for people who define their data using ProtoBuf, but use JSON for the "wi
 
 "Heavily influenced" by [Google's protobuf-to-BigQuery-schema compiler](https://github.com/GoogleCloudPlatform/protoc-gen-bq-schema).
 
-
-Generated Schemas
------------------
+## Generated Schemas
 
 - One JSONSchema file is generated for each root-level proto message and ENUM. These are intended to be stand alone self-contained schemas which can be used to validate a payload derived from their source proto message
 - Nested message schemas become [referenced "definitions"](https://cswr.github.io/JsonSchema/spec/definitions_references/). This means that you know the name of the proto message they came from, and their schema is not duplicated (within the context of one JSONSchema file at least)
 
-
-Logic
------
+## Logic
 
 - For each proto file provided
   - Generates schema for each ENUM
@@ -37,21 +32,17 @@ Logic
     - JSONSchema filename derived from Message name
   - Bundles these into a protoc generator response
 
-
-Installation
-------------
+## Installation
 
 > Note: This tool requires Go 1.11+ to be installed.
 
 Install this plugin using Go:
 
 ```sh
-go install github.com/chrusty/protoc-gen-jsonschema/cmd/protoc-gen-jsonschema@latest
+go install github.com/ianvdhSBM/protoc-gen-jsonschema/cmd/protoc-gen-jsonschema@latest
 ```
 
-
-Usage
------
+## Usage
 
 > Note: This plugin requires the [`protoc`](https://github.com/protocolbuffers/protobuf) CLI to be installed.
 
@@ -63,29 +54,25 @@ protoc \ # The protobuf compiler
 --proto_path=testdata/proto testdata/proto/ArrayOfPrimitives.proto # proto input directories and folders
 ```
 
-
-Configuration Parameters
-------------------------
+## Configuration Parameters
 
 The following configuration parameters are supported. They should be added to the protoc command and can be combined as a comma-delimited string. Some examples are included in the following Examples section.
 
-| CONFIG | DESCRIPTION |
-|--------|-------------|
-|`all_fields_required`| Require all fields in schema |
-|`allow_null_values`| Allow null values in schema |
-|`debug`| Enable debug logging |
-|`disallow_additional_properties`| Disallow additional properties in schema |
-|`disallow_bigints_as_strings`| Disallow big integers as strings |
-|`enforce_oneof`| Interpret Proto "oneOf" clauses |
-|`enums_as_strings_only`| Only include strings in the allowed values for enums |
-|`file_extension`| Specify a custom file extension for generated schemas |
-|`json_fieldnames`| Use JSON field names only |
-|`prefix_schema_files_with_package`| Prefix the output filename with package |
-|`proto_and_json_fieldnames`| Use proto and JSON field names |
+| CONFIG                             | DESCRIPTION                                           |
+| ---------------------------------- | ----------------------------------------------------- |
+| `all_fields_required`              | Require all fields in schema                          |
+| `allow_null_values`                | Allow null values in schema                           |
+| `debug`                            | Enable debug logging                                  |
+| `disallow_additional_properties`   | Disallow additional properties in schema              |
+| `disallow_bigints_as_strings`      | Disallow big integers as strings                      |
+| `enforce_oneof`                    | Interpret Proto "oneOf" clauses                       |
+| `enums_as_strings_only`            | Only include strings in the allowed values for enums  |
+| `file_extension`                   | Specify a custom file extension for generated schemas |
+| `json_fieldnames`                  | Use JSON field names only                             |
+| `prefix_schema_files_with_package` | Prefix the output filename with package               |
+| `proto_and_json_fieldnames`        | Use proto and JSON field names                        |
 
-
-Custom Proto Options
---------------------
+## Custom Proto Options
 
 If you don't want to use the configuration parameters (admittedly quite a nasty cli syntax) then some of the generator behaviour can be controlled using custom proto options. These are defined in [options.proto](options.proto), and your protoc command will need to include this file. See the [sample protos](internal/converter/testdata/proto) and generator commands in the [Makefile](Makefile).
 
@@ -121,9 +108,7 @@ These options apply to a specific proto message.
 - [disallow_additional_properties](internal/converter/testdata/proto/OptionDisallowAdditionalProperties.proto): Only accept the specific properties, no extras
 - [enums_as_constants](internal/converter/testdata/proto/OptionEnumsAsConstants.proto): Encode ENUMs (and their annotations) as CONST
 
-
-Examples
---------
+## Examples
 
 ### Require all fields
 
@@ -156,7 +141,7 @@ protoc \
 ### Disallow additional properties
 
 > JSONSchemas won't validate JSON containing extra parameters
-    
+
 ```sh
 protoc \
 --jsonschema_out=disallow_additional_properties:. \
@@ -210,26 +195,22 @@ protoc \
 --proto_path=internal/converter/testdata/proto internal/converter/testdata/proto/ArrayOfPrimitives.proto
 ```
 
+## Sample protos (for testing)
 
-Sample protos (for testing)
----------------------------
+- Proto with a simple (flat) structure: [samples.PayloadMessage](internal/converter/testdata/proto/PayloadMessage.proto)
+- Proto containing a nested object (defined internally): [samples.NestedObject](internal/converter/testdata/proto/NestedObject.proto)
+- Proto containing a nested message (defined in a different proto file): [samples.NestedMessage](internal/converter/testdata/proto/NestedMessage.proto)
+- Proto containing an array of a primitive types (string, int): [samples.ArrayOfPrimitives](internal/converter/testdata/proto/ArrayOfPrimitives.proto)
+- Proto containing an array of objects (internally defined): [samples.ArrayOfObjects](internal/converter/testdata/proto/ArrayOfObjects.proto)
+- Proto containing an array of messages (defined in a different proto file): [samples.ArrayOfMessage](internal/converter/testdata/proto/ArrayOfMessage.proto)
+- Proto containing multi-level enums (flat and nested and arrays): [samples.Enumception](internal/converter/testdata/proto/Enumception.proto)
+- Proto containing a stand-alone enum: [samples.ImportedEnum](internal/converter/testdata/proto/ImportedEnum.proto)
+- Proto containing 2 stand-alone enums: [samples.FirstEnum, samples.SecondEnum](internal/converter/testdata/proto/SeveralEnums.proto)
+- Proto containing 2 messages: [samples.FirstMessage, samples.SecondMessage](internal/converter/testdata/proto/SeveralMessages.proto)
+- Proto containing 12 messages: [samples.MessageKind1 - samples.MessageKind12](internal/converter/testdata/proto/TwelveMessages.proto)
 
-* Proto with a simple (flat) structure: [samples.PayloadMessage](internal/converter/testdata/proto/PayloadMessage.proto)
-* Proto containing a nested object (defined internally): [samples.NestedObject](internal/converter/testdata/proto/NestedObject.proto)
-* Proto containing a nested message (defined in a different proto file): [samples.NestedMessage](internal/converter/testdata/proto/NestedMessage.proto)
-* Proto containing an array of a primitive types (string, int): [samples.ArrayOfPrimitives](internal/converter/testdata/proto/ArrayOfPrimitives.proto)
-* Proto containing an array of objects (internally defined): [samples.ArrayOfObjects](internal/converter/testdata/proto/ArrayOfObjects.proto)
-* Proto containing an array of messages (defined in a different proto file): [samples.ArrayOfMessage](internal/converter/testdata/proto/ArrayOfMessage.proto)
-* Proto containing multi-level enums (flat and nested and arrays): [samples.Enumception](internal/converter/testdata/proto/Enumception.proto)
-* Proto containing a stand-alone enum: [samples.ImportedEnum](internal/converter/testdata/proto/ImportedEnum.proto)
-* Proto containing 2 stand-alone enums: [samples.FirstEnum, samples.SecondEnum](internal/converter/testdata/proto/SeveralEnums.proto)
-* Proto containing 2 messages: [samples.FirstMessage, samples.SecondMessage](internal/converter/testdata/proto/SeveralMessages.proto)
-* Proto containing 12 messages: [samples.MessageKind1 - samples.MessageKind12](internal/converter/testdata/proto/TwelveMessages.proto)
+## Links
 
-
-Links
------
-
-* [About JSON Schema](http://json-schema.org/)
-* [Popular GoLang JSON-Schema validation library](https://github.com/xeipuuv/gojsonschema)
-* [Another GoLang JSON-Schema validation library](https://github.com/lestrrat/go-jsschema)
+- [About JSON Schema](http://json-schema.org/)
+- [Popular GoLang JSON-Schema validation library](https://github.com/xeipuuv/gojsonschema)
+- [Another GoLang JSON-Schema validation library](https://github.com/lestrrat/go-jsschema)
